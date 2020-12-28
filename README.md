@@ -2,10 +2,9 @@
 
 proxy handlers:
 
-- LoginAction::class
-- LogoutAction::class
-- AccessAction::class
-- AuthAction::class
+- LoginHandler::class
+- LogoutHandler::class
+- AccessHandler::class
 
 # Example
 
