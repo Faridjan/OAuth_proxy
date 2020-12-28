@@ -1,7 +1,7 @@
 # OAuth_proxy
 proxy actions: 
 - LoginAction::class
-- LogoutACtion::class
+- LogoutAction::class
 - AccessAction::class
 
 # Example 
