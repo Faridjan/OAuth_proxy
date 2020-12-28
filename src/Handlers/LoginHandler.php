@@ -44,7 +44,7 @@ class LoginHandler
             'domain' => $this->configStore->get('OAUTH_DOMAIN')
         ];
 
-        $responseClient = $this->httpClient->post($url, $body);
+        $responseClient = $this->httpClient->post($url, $body)->getBody()->getContents();
 
         $this->converter->fromJWTToFrontend($responseClient);
 
