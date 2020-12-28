@@ -1,0 +1,31 @@
+{
+  "description": "Proxy server for Auth with JWT",
+  "name": "autokz/oauth_proxy",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "config": {
+    "sort-packages": true
+  },
+  "require": {
+    "php": ">=7.4.0",
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "dflydev/fig-cookies": "^2.0",
+    "guzzlehttp/guzzle": "^7.2",
+    "roave/security-advisories": "dev-latest",
+    "vlucas/phpdotenv": "^5.2",
+    "webmozart/assert": "^1.9"
+  },
+  "autoload": {
+    "psr-4": {
+      "Proxy\\OAuth\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Farid",
+      "email": "fred.andersen7@gmail.com"
+    }
+  ]
+}
