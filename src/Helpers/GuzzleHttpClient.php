@@ -14,17 +14,17 @@ use Proxy\OAuth\Interfaces\HttpClientInterface;
 class GuzzleHttpClient implements HttpClientInterface
 {
 
-    public function get(string $url, array $body = [], array $headers = [])
+    public function get(string $url, array $body = [], array $headers = [], array $options = [])
     {
-        return $this->process('GET', $url, $body, $headers);
+        return $this->process('GET', $url, $body, $headers, $options);
     }
 
-    public function post(string $url, array $body = [], array $headers = [])
+    public function post(string $url, array $body = [], array $headers = [], array $options = [])
     {
-        return $this->process('POST', $url, $body, $headers);
+        return $this->process('POST', $url, $body, $headers, $options);
     }
 
-    public function process(string $method, string $url, array $body = [], array $headers = [])
+    public function process(string $method, string $url, array $body = [], array $headers = [], array $options = [])
     {
         $client = new Client();
 
@@ -34,10 +34,12 @@ class GuzzleHttpClient implements HttpClientInterface
                 $url,
                 [
                     'form_params' => $body,
-                    'headers' => $headers
+                    'headers' => $headers,
+                    $options
                 ],
             )->getBody()->getContents();
         } catch (ClientException $e) {
+            var_dump(json_decode((string)$e->getResponse()->getBody()));
             throw new Exception(
                 json_decode((string)$e->getResponse()->getBody())->message,
                 $e->getCode()

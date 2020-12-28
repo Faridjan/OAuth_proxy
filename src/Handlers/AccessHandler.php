@@ -34,10 +34,12 @@ class AccessHandler
         $this->token = $token;
     }
 
-    public function __invoke(): string
+    public function __invoke()
     {
+        $token = $this->getToken();
+        $decryptedToken = json_decode($this->converter->fromFrontendToJWT($token), true);
         if (!$this->check()) {
-            $responseClient = $this->refresh();
+            $responseClient = $this->refresh($decryptedToken['refresh_token']);
             $this->converter->fromJWTToFrontend($responseClient);
         }
         return $responseClient;
@@ -45,7 +47,6 @@ class AccessHandler
 
     public function check(): bool
     {
-        $token = $this->getToken();
         $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
         $checkUrl = trim($this->configStore->get('OAUTH_CHECK_URL'), '/');
 
@@ -54,27 +55,24 @@ class AccessHandler
         $decryptedToken = json_decode($this->converter->fromFrontendToJWT($token), true);
 
         $headers = [
-            'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedToken['access_token']
+            'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedToken['access_token'],
         ];
 
-        $responseClient = $this->httpClient->post($url, [], array($headers, ['http_errors' => false]));
+        $responseClient = $this->httpClient->get($url, [], $headers, ['http_errors' => false]);
 
         return $responseClient->getStatus() === 400;
     }
 
-    public function refresh(): string
+    public function refresh(string $refreshToken): string
     {
-        $token = $this->token;
         $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
         $loginUrl = trim($this->configStore->get('OAUTH_URL'), '/');
 
         $url = $baseUrl . '/' . $loginUrl;
 
-        $decryptedToken = json_decode($this->converter->fromFrontendToJWT($token), true);
-
         $body = [
             'grant_type' => $this->configStore->get('OAUTH_REFRESH_GRANT_TYPE'),
-            'refresh_token' => $decryptedToken['refresh_token'],
+            'refresh_token' => $refreshToken,
             'client_id' => $this->configStore->get('OAUTH_CLIENT_ID'),
             'client_secret' => $this->configStore->get('OAUTH_CLIENT_SECRET'),
         ];
