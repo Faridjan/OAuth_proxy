@@ -38,6 +38,7 @@ class AccessHandler
     {
         $token = $this->getToken();
         $decryptedToken = json_decode($this->converter->fromFrontendToJWT($token), true);
+
         if (!$this->check()) {
             $responseClient = $this->refresh($decryptedToken['refresh_token']);
             $this->converter->fromJWTToFrontend($responseClient);
@@ -47,6 +48,7 @@ class AccessHandler
 
     public function check(): bool
     {
+        $token = $this->getToken();
         $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
         $checkUrl = trim($this->configStore->get('OAUTH_CHECK_URL'), '/');
 
@@ -60,10 +62,11 @@ class AccessHandler
 
         $responseClient = $this->httpClient->get($url, [], $headers, ['http_errors' => false]);
 
-        return $responseClient->getStatus() === 400;
+
+        return $responseClient->getStatusCode() === 200;
     }
 
-    public function refresh(string $refreshToken): string
+    public function refresh(string $refreshToken)
     {
         $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
         $loginUrl = trim($this->configStore->get('OAUTH_URL'), '/');

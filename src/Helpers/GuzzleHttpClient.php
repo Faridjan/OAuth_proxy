@@ -32,14 +32,16 @@ class GuzzleHttpClient implements HttpClientInterface
             return $client->request(
                 $method,
                 $url,
-                [
-                    'form_params' => $body,
-                    'headers' => $headers,
+                array_merge(
+                    [
+                        'form_params' => $body,
+                        'headers' => $headers,
+                    ],
                     $options
-                ],
-            )->getBody()->getContents();
+                )
+
+            );
         } catch (ClientException $e) {
-            var_dump(json_decode((string)$e->getResponse()->getBody()));
             throw new Exception(
                 json_decode((string)$e->getResponse()->getBody())->message,
                 $e->getCode()
