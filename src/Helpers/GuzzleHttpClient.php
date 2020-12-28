@@ -33,6 +33,6 @@ class GuzzleHttpClient implements HttpClientInterface
                 'form_params' => $body,
                 'headers' => $headers
             ],
-        )->getBody()->getContents();
+        );
     }
 }

@@ -46,7 +46,7 @@ class AuthAction
         ];
 
         try {
-            $responseClient = $this->httpClient->post($url, $body);
+            $responseClient = $this->httpClient->post($url, $body)->getBody()->getContents();
         } catch (Exception $e) {
             return [
                 'message' => json_decode($e->getResponse()->getBody()->getContents())->message,

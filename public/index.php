@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Proxy\OAuth\Actions\AuthAction;
-use Proxy\OAuth\Actions\RefreshAction;
+use Proxy\OAuth\Actions\AccessAction;
 use Proxy\OAuth\Actions\Type\PasswordType;
 use Proxy\OAuth\Actions\Type\UsernameType;
 use Proxy\OAuth\Helpers\DotEnvConfigStorage;
@@ -25,7 +25,7 @@ $configStore->load();
 #-------------------------------------
 //$authAction = new AuthAction($converter, $httpClient, $configStore);
 //
-//$username = new UsernameType('farid');
+//$username = new UsernameType('tyanrv');
 //$password = new PasswordType('hash');
 //
 //print_r($authAction->login($username, $password));
@@ -35,17 +35,17 @@ $configStore->load();
 $token = [
     "token_type" => 'Bearer',
     "expires_in" => "60",
-    "access_token" => "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJhcHAiLCJqdGkiOiI1MGIyM2MwNjk2MWMxZmRhYWMyYWIyZTRmMzBlZGE2MzA4MGI4NDFmNzExNDkwM2YyOTE1NmRlNjU0MjMwNjVjYTMwYWRiNzJmZTc1MzgxYyIsImlhdCI6IjE2MDkxNDQ4ODguNTc2NzEyIiwibmJmIjoiMTYwOTE0NDg4OC41NzY3MTYiLCJleHAiOiIxNjA5MTQ0OTQ4LjU2NjU0OCIsInN1YiI6IjAzNDY3NzQ5LWI1ZGEtNGM4NC1iNzY2LTkwY2QxMTk5YmZkNSIsInNjb3BlcyI6W119.3SdLhPANabJmGCP-70oTp-9c49SROUWcApypgJ4D8K0fGuLr_6U1Y8bG0Utky0htZ7jBdpOcWlSaTrcn5glTvqqHmXa1icXI8ujgxM6qaXLEkgnsOPkwV9HSU3kuWd2PL0nvTRFcD-AlfQXv26PYQ8xDdv1HLkDFyeM7QxFCSAjXlJYf_JStuTrK6YkFYLZoa6fFHlCqClHhr_XlilwYhKMSom_gUJ15v8WhN4iLj47lkZ3n5dff-yoky71kvhr90e32GkYzBaV4_gAaELdYK_N9_WbwF6-scmPlkcctHVE1RPh0kAlqS0XlQV9EXbkJ_-UV-DaEscQgjwBpaBs1qw",
-    "refresh_token" => "def502009bd24971badb44958a1e3e9e95fad6b6f3804849191c5aa415f196ebce6611a4174a4cbd7a767bc7923a47b9a92d75521e10ca2d49b011a2d923690e792253576775bd9996d8aae204453b1bde699ef3666d11f18296010ef9797e3c849c7be8671e16ff34bfed93317bf614ba08e865e916fc66e94bc1745aefee706a5449396399d8ff33dad362e734ee5f8294b996ba6eb81a98564ed2f3b6437e187d5d4fdc2bf7f3c2eb191ca14a53d74db5fe65cbb3cb0317c296c33c7a48d292b92eda98477473391fd9a82798d435f39d670f7b6090bb772bd0fef05d0262256d8aa87a8c7a8858dcc07f59b474ef3bfb0975fcd4fb2898cfdea1483edaec2c7ec64801c0edf2c123c67148da0521a13a724b40501c28698093ef2fea825f35481228f14816afde001f0cad1f8329bc09e740cfc7c2c8e6622b13eaa61327c54a9cf50e86d9ede0eb3927b7adb9309e99913f5267cacabf78374fcd0b7eacaa49b4c6a05c36b54fd866e1c95fa42c6a2ebaaaa8c7d6583bec24dd212c6bc327f7dde49d076d2935313eda075477c76edbfbcfa56a6168f11422680ec0bf29165514a1e21a398662c28a84aa057c599dc4c078496efaecaf7ea0"
+    "access_token" => "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJhcHAiLCJqdGkiOiI3ZGQ0MjZhMThkODk3YWZhOWJjOTBlMzE2MmEyNzA2ZGI5NTUzMzRkMDY1M2QzNzFjMDg0NmZmY2U4MzU5ZjAxYmY4YzI4ZjlmODY1ZGNmMiIsImlhdCI6IjE2MDkxNTE4MjMuNTI5ODg1IiwibmJmIjoiMTYwOTE1MTgyMy41Mjk4OTUiLCJleHAiOiIxNjA5MTUxODgzLjUxNTY4MCIsInN1YiI6ImIwNWJmZjkyLTkzZmYtNGU4Mi1hNjhiLWFkZjAxZjQ4ZjM4OCIsInNjb3BlcyI6W10sImRvbWFpbl9pZCI6IjdhNzhhZDRlLTVkZTQtNDViOC05MzZmLTBlNDdiNWYwMjVmNSJ9.4Kv1vqmMktJPX7dBaM8FJoktqvV4iPSfhStqXBYJq1Zps4YmMAuBrYwlqLb32muBgr8jIjoPj1jlTJdOogs3qTeKUILX_MTusOxzQR9166xAEVx52KdqQV1e9NGQd-i_KHGHv0zwVmMUF5ypF46iLBzQdIROEtFWBZqtjToDjHQa91AxGT1-M737rmh4dRFBmlytJ2G8U2pXodO1Xx4cZ_18pSLTeb2kAGzyQT3wuB3PbEXM5zobx6Mi_wsN7WFxZSf1gavMq_64sZ2ovN0d6vS4DpCOsIZWA9-gTZAC8EE30wEeD3Nzpz0Y1O_ExOtmv7CORm9M_C9mChB7QiVW5Q",
+    "refresh_token" => "def50200b408883210d11836844e7cc70bd3337f397cb75c98c46b2d17952790ad82c14648c7cd53bf5ea1217279e8180d6b59f3187821c96e13d5a1410c01229c65f09c6b451204582b4d9f0e9522edca42b3a9df858ca7e6ee9e6249cb0c6515c8da463b86d789d899f6e5930df425ea5b8980d605d720ec79ca5837007b2c68273e67edfbbf7a069227a2272909b8958a19995a4e1c54073b26a605eb9d0e1fdfdfe50830dc9664199fc4b56c7f1b5f2f397c3527bd908658e852392e29f99ab480aa766a9978d21e1e9d3eb7861e3fef6256360509e69deb1e6bc4694036427fb8a01bfc196f708e190db3574574758a679636d68af34d3384abb0e38cc73fa86137c0a09ca5f7023a8801716549e0c8d91e071549b73ec979c766f82a4a4f4b14ecb81e40134adfff5226d0170283ac79f0ac9a0b7546554206572fb439342152ee91a69c6e7c887cda8fef2fa0acaefbc98505594b83c722e23a2e02a06299e45747db986e720d5bd251892fe65d1530a174a6641057d9031f7d662d650ab376c590d0dbc09e2a3718d86442b72fd2e02c553d598907b216a5a4d321aca2341b338065eb9669c242e3a0c54430ade0e9b13e4b7a6399b697"
 ];
-$refreshAction = new RefreshAction($converter, $httpClient, $configStore, $token);
+$refreshAction = new AccessAction($converter, $httpClient, $configStore, $token);
 
 // REFRESH
-//print_r(
-//    $refreshAction->refresh()
-//);
+print_r(
+    $refreshAction->refresh()
+);
 
 // CHECK
-print_r(
-    $refreshAction->check()
-);
+//print_r(
+//    $refreshAction->check()
+//);

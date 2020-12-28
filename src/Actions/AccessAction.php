@@ -7,13 +7,12 @@ namespace Proxy\OAuth\Actions;
 
 
 use Exception;
-use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
 use Proxy\OAuth\Interfaces\ConverterInterface;
 use Proxy\OAuth\Interfaces\HttpClientInterface;
 
-class RefreshAction
+class AccessAction
 {
     private ConverterInterface $converter;
     private HttpClientInterface $httpClient;
@@ -25,12 +24,18 @@ class RefreshAction
         ConverterInterface $converter,
         HttpClientInterface $httpClient,
         ConfigStoreInterface $configStore,
-        array $token
+        array $token = []
     ) {
         $this->converter = $converter;
         $this->httpClient = $httpClient;
         $this->configStore = $configStore;
         $this->token = $token;
+    }
+
+
+    public function __invoke()
+    {
+        // TODO: Implement __invoke() method.
     }
 
     public function check(): void
@@ -47,7 +52,7 @@ class RefreshAction
             'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedToken['access_token']
         ];
 
-        $this->execute($url, [], $headers);
+        $this->execute('GET', $url, [], $headers);
     }
 
     public function refresh(): void
@@ -67,23 +72,34 @@ class RefreshAction
             'client_secret' => $this->configStore->get('OAUTH_CLIENT_SECRET'),
         ];
 
-        $this->execute($url, $body);
+        $this->execute('POST', $url, $body);
     }
 
-    private function execute(string $url, array $body = null, array $headers = null)
+    private function execute(string $method, string $url, array $body = [], array $headers = [])
     {
         try {
-            $responseClient = $this->httpClient->post($url, $body, $headers);
+            $responseClient = $this->httpClient->process($method, $url, $body, $headers)->getBody()->getContents();
         } catch (ClientException $e) {
-            return [
-                'message' => json_decode($e->getResponse()->getBody()->getContents())->message,
-                'code' => $e->getCode()
-            ];
+            throw new Exception(
+                json_decode($e->getResponse()->getBody()->getContents())->message,
+                $e->getCode()
+            );
         }
 
         $this->converter->fromJWTToFrontend($responseClient);
 
         return $responseClient;
+    }
+
+
+    public function getToken(): array
+    {
+        return $this->token;
+    }
+
+    public function setToken(array $token): void
+    {
+        $this->token = $token;
     }
 
 
