@@ -79,14 +79,7 @@ class AccessHandler
             'client_secret' => $this->configStore->get('OAUTH_CLIENT_SECRET'),
         ];
 
-        try {
-            return $this->httpClient->post($url, $body, []);
-        } catch (ClientException $e) {
-            throw new Exception(
-                json_decode($e->getRequest()->getBody()->getContents())->message,
-                $e->getCode()
-            );
-        }
+        return $this->httpClient->post($url, $body, []);
     }
 
     public function getToken(): array
