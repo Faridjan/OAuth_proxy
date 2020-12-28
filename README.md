@@ -1,5 +1,5 @@
 # OAuth_proxy
-poxy actions: 
+proxy actions: 
 - LoginAction::class
 - LogoutACtion::class
 - AccessAction::class
