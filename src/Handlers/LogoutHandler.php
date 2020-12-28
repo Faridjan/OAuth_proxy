@@ -57,7 +57,7 @@ class LogoutHandler
             'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedToken['access_token']
         ];
 
-        $response = $this->httpClient->process('POST', $url, [], $headers);
+        $response = $this->httpClient->post($url, [], $headers);
 
         if ($response->getStatusCode() === 200) {
             return;
@@ -71,7 +71,7 @@ class LogoutHandler
                 'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $data['access_token']
             ];
 
-            $response = $this->httpClient->process('GET', $url, [], $headers);
+            $response = $this->httpClient->post($url, [], $headers);
         }
 
         if ($response->getStatusCode() !== 200) {
