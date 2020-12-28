@@ -7,6 +7,7 @@ namespace Proxy\OAuth\Handlers;
 
 
 use Exception;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
@@ -33,9 +34,18 @@ class AccessHandler
         $this->token = $token;
     }
 
-    public function check(): void
+    public function __invoke(): string
     {
-        $token = $this->token;
+        if (!$this->check()) {
+            $responseClient = $this->refresh();
+            $this->converter->fromJWTToFrontend($responseClient);
+        }
+        return $responseClient;
+    }
+
+    public function check(): bool
+    {
+        $token = $this->getToken();
         $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
         $checkUrl = trim($this->configStore->get('OAUTH_CHECK_URL'), '/');
 
@@ -47,10 +57,12 @@ class AccessHandler
             'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedToken['access_token']
         ];
 
-        $this->execute($url, [], $headers);
+        $responseClient = $this->httpClient->post($url, [], array($headers, ['http_errors' => false]));
+
+        return $responseClient->getStatus() === 400;
     }
 
-    public function refresh(): void
+    public function refresh(): string
     {
         $token = $this->token;
         $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
@@ -67,23 +79,14 @@ class AccessHandler
             'client_secret' => $this->configStore->get('OAUTH_CLIENT_SECRET'),
         ];
 
-        $this->execute($url, $body);
-    }
-
-    private function execute(string $url, array $body = null, array $headers = null)
-    {
         try {
-            $responseClient = $this->httpClient->post($url, $body, $headers);
+            return $this->httpClient->post($url, $body, []);
         } catch (ClientException $e) {
-            return [
-                'message' => json_decode($e->getResponse()->getBody()->getContents())->message,
-                'code' => $e->getCode()
-            ];
+            throw new Exception(
+                json_decode($e->getRequest()->getBody()->getContents())->message,
+                $e->getCode()
+            );
         }
-
-        $this->converter->fromJWTToFrontend($responseClient);
-
-        return $responseClient;
     }
 
     public function getToken(): array
