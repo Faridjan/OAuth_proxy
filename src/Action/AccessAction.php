@@ -3,18 +3,14 @@
 declare(strict_types=1);
 
 
-namespace Proxy\OAuth\Handlers;
+namespace Proxy\OAuth\Action;
 
 
-use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\ClientException;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
 use Proxy\OAuth\Interfaces\ConverterInterface;
 use Proxy\OAuth\Interfaces\HttpClientInterface;
 
-class AccessHandler
+class AccessAction
 {
     private ConverterInterface $converter;
     private HttpClientInterface $httpClient;
@@ -34,7 +30,7 @@ class AccessHandler
         $this->token = $token;
     }
 
-    public function __invoke()
+    public function __invoke(): array
     {
         $token = $this->getToken();
         $decryptedToken = json_decode($this->converter->fromFrontendToJWT($token), true);
@@ -66,7 +62,7 @@ class AccessHandler
         return $responseClient->getStatusCode() === 200;
     }
 
-    public function refresh(string $refreshToken)
+    public function refresh(string $refreshToken): string
     {
         $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
         $loginUrl = trim($this->configStore->get('OAUTH_URL'), '/');

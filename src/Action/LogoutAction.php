@@ -3,31 +3,29 @@
 declare(strict_types=1);
 
 
-namespace Proxy\OAuth\Handlers;
+namespace Proxy\OAuth\Action;
 
 
 use Exception;
-use GuzzleHttp\Psr7\Response;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
 use Proxy\OAuth\Interfaces\ConverterInterface;
 use Proxy\OAuth\Interfaces\HttpClientInterface;
-use Psr\Http\Message\ResponseInterface;
 
-class LogoutHandler
+class LogoutAction
 {
 
     private ConverterInterface $converter;
     private HttpClientInterface $httpClient;
     private ConfigStoreInterface $configStore;
     private array $authData;
-    private AccessHandler $accessHandler;
+    private AccessAction $accessHandler;
 
     public function __construct(
         ConverterInterface $converter,
         HttpClientInterface $httpClient,
         ConfigStoreInterface $configStore,
         array $authData,
-        AccessHandler $accessHandler
+        AccessAction $accessHandler
     ) {
         $this->converter = $converter;
         $this->httpClient = $httpClient;
@@ -46,14 +44,14 @@ class LogoutHandler
         $this->authData = $authData;
     }
 
-    public function logout(): void
+    public function logout(): bool
     {
         $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
         $checkUrl = trim($this->configStore->get('OAUTH_LOGOUT_URL'), '/');
 
         $url = $baseUrl . '/' . $checkUrl;
 
-        $decryptedToken = json_decode($this->converter->fromFrontendToJWT($this->authData), true);
+        $decryptedToken = json_decode($this->converter->fromFrontendToJWT($this->getAuthData()), true);
 
         $headers = [
             'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedToken['access_token']
@@ -62,7 +60,7 @@ class LogoutHandler
         $response = $this->httpClient->post($url, [], $headers, ['http_errors' => false]);
 
         if ($response->getStatusCode() === 200) {
-            return;
+            return true;
         }
 
         if ($response->getStatusCode() === 400) {
@@ -79,5 +77,7 @@ class LogoutHandler
         if ($response->getStatusCode() !== 200) {
             throw new Exception('Some Exception text.');
         }
+
+        return true;
     }
 }
