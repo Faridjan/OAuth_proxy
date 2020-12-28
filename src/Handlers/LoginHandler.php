@@ -17,15 +17,18 @@ class LoginHandler
     private ConverterInterface $converter;
     private HttpClientInterface $httpClient;
     private ConfigStoreInterface $configStore;
+    private array $token;
 
     public function __construct(
         ConverterInterface $converter,
         HttpClientInterface $httpClient,
-        ConfigStoreInterface $configStore
+        ConfigStoreInterface $configStore,
+        array $token
     ) {
         $this->converter = $converter;
         $this->httpClient = $httpClient;
         $this->configStore = $configStore;
+        $this->token = $token;
     }
 
     public function login(UsernameType $username, PasswordType $password)
@@ -55,4 +58,16 @@ class LoginHandler
         }
         return $this->converter->fromJWTToFrontend($responseClient);
     }
+
+
+    public function getToken(): array
+    {
+        return $this->token;
+    }
+
+    public function setToken(array $token): void
+    {
+        $this->token = $token;
+    }
+
 }

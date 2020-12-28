@@ -86,5 +86,15 @@ class AccessHandler
         return $responseClient;
     }
 
+    public function getToken(): array
+    {
+        return $this->token;
+    }
+
+    public function setToken(array $token): void
+    {
+        $this->token = $token;
+    }
+
 
 }
