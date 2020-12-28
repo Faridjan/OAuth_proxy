@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace Proxy\OAuth\Handlers;
 
 
+use Exception;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
 use Proxy\OAuth\Interfaces\ConverterInterface;
 use Proxy\OAuth\Interfaces\HttpClientInterface;
@@ -58,6 +59,10 @@ class LogoutHandler
 
         $response = $this->httpClient->process('POST', $url, [], $headers);
 
+        if ($response->getStatusCode() === 200) {
+            return;
+        }
+
         if ($response->getStatusCode() === 400) {
             $responseBody = $this->accessHandler->refresh($decryptedToken['refresh_token']);
             $data = json_decode((string) $responseBody, true);
@@ -65,12 +70,12 @@ class LogoutHandler
             $headers = [
                 'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $data['access_token']
             ];
+
+            $response = $this->httpClient->process('GET', $url, [], $headers);
         }
 
-        $response = $this->httpClient->process('GET', $url, [], $headers);
-
         if ($response->getStatusCode() !== 200) {
-            throw new \Exception('Some Exception text.');
+            throw new Exception('Some Exception text.');
         }
 
     }
