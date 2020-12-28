@@ -41,10 +41,9 @@ class AccessHandler
 
         if (!$this->check()) {
             $responseClient = $this->refresh($decryptedToken['refresh_token']);
-            $this->converter->fromJWTToFrontend($responseClient);
-            return '__NEXT-HANDLER__';
+            return $this->converter->fromJWTToFrontend($responseClient);
         }
-        return '__NEXT-HANDLER__';
+        return $token;
     }
 
     public function check(): bool

@@ -27,7 +27,7 @@ class LoginHandler
         $this->configStore = $configStore;
     }
 
-    public function login(UsernameType $username, PasswordType $password)
+    public function login(UsernameType $username, PasswordType $password): array
     {
         $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
         $loginUrl = trim($this->configStore->get('OAUTH_URL'), '/');
@@ -46,8 +46,6 @@ class LoginHandler
 
         $responseClient = $this->httpClient->post($url, $body)->getBody()->getContents();
 
-        $this->converter->fromJWTToFrontend($responseClient);
-
-        return $responseClient;
+        return $this->converter->fromJWTToFrontend($responseClient);
     }
 }

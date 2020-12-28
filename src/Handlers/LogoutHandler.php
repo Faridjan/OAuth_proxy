@@ -7,9 +7,11 @@ namespace Proxy\OAuth\Handlers;
 
 
 use Exception;
+use GuzzleHttp\Psr7\Response;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
 use Proxy\OAuth\Interfaces\ConverterInterface;
 use Proxy\OAuth\Interfaces\HttpClientInterface;
+use Psr\Http\Message\ResponseInterface;
 
 class LogoutHandler
 {
