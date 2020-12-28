@@ -57,7 +57,7 @@ class LogoutHandler
             'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedToken['access_token']
         ];
 
-        $response = $this->httpClient->post($url, [], $headers);
+        $response = $this->httpClient->post($url, [], $headers, ['http_errors' => false]);
 
         if ($response->getStatusCode() === 200) {
             return;
@@ -65,7 +65,7 @@ class LogoutHandler
 
         if ($response->getStatusCode() === 400) {
             $responseBody = $this->accessHandler->refresh($decryptedToken['refresh_token']);
-            $data = json_decode((string) $responseBody, true);
+            $data = json_decode((string)$responseBody, true);
 
             $headers = [
                 'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $data['access_token']
@@ -77,6 +77,5 @@ class LogoutHandler
         if ($response->getStatusCode() !== 200) {
             throw new Exception('Some Exception text.');
         }
-
     }
 }
