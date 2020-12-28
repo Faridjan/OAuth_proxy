@@ -5,7 +5,6 @@ declare(strict_types=1);
 
 namespace Proxy\OAuth\Handlers;
 
-use Exception;
 use Proxy\OAuth\Handlers\Type\PasswordType;
 use Proxy\OAuth\Handlers\Type\UsernameType;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
@@ -17,18 +16,15 @@ class LoginHandler
     private ConverterInterface $converter;
     private HttpClientInterface $httpClient;
     private ConfigStoreInterface $configStore;
-    private array $token;
 
     public function __construct(
         ConverterInterface $converter,
         HttpClientInterface $httpClient,
-        ConfigStoreInterface $configStore,
-        array $token
+        ConfigStoreInterface $configStore
     ) {
         $this->converter = $converter;
         $this->httpClient = $httpClient;
         $this->configStore = $configStore;
-        $this->token = $token;
     }
 
     public function login(UsernameType $username, PasswordType $password)
@@ -48,26 +44,10 @@ class LoginHandler
             'domain' => $this->configStore->get('OAUTH_DOMAIN')
         ];
 
-        try {
-            $responseClient = $this->httpClient->post($url, $body);
-        } catch (Exception $e) {
-            return [
-                'message' => json_decode($e->getResponse()->getBody()->getContents())->message,
-                'code' => $e->getCode()
-            ];
-        }
-        return $this->converter->fromJWTToFrontend($responseClient);
+        $responseClient = $this->httpClient->post($url, $body);
+
+        $this->converter->fromJWTToFrontend($responseClient);
+
+        return $responseClient;
     }
-
-
-    public function getToken(): array
-    {
-        return $this->token;
-    }
-
-    public function setToken(array $token): void
-    {
-        $this->token = $token;
-    }
-
 }

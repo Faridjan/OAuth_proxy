@@ -39,7 +39,7 @@ class GuzzleHttpClient implements HttpClientInterface
             )->getBody()->getContents();
         } catch (ClientException $e) {
             throw new Exception(
-                json_decode($e->getRequest()->getBody()->getContents())->message,
+                json_decode((string)$e->getResponse()->getBody())->message,
                 $e->getCode()
             );
         }
