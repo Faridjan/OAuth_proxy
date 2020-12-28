@@ -3,16 +3,16 @@
 declare(strict_types=1);
 
 
-namespace Proxy\OAuth\Actions;
+namespace Proxy\OAuth\Handlers;
 
 use Exception;
-use Proxy\OAuth\Actions\Type\PasswordType;
-use Proxy\OAuth\Actions\Type\UsernameType;
+use Proxy\OAuth\Handlers\Type\PasswordType;
+use Proxy\OAuth\Handlers\Type\UsernameType;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
 use Proxy\OAuth\Interfaces\ConverterInterface;
 use Proxy\OAuth\Interfaces\HttpClientInterface;
 
-class AuthAction
+class LoginHandler
 {
     private ConverterInterface $converter;
     private HttpClientInterface $httpClient;

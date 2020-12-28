@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 
-namespace Proxy\OAuth\Actions;
+namespace Proxy\OAuth\Handlers;
 
 
 use Exception;
@@ -13,7 +13,7 @@ use Proxy\OAuth\Interfaces\ConfigStoreInterface;
 use Proxy\OAuth\Interfaces\ConverterInterface;
 use Proxy\OAuth\Interfaces\HttpClientInterface;
 
-class RefreshAction
+class AccessHandler
 {
     private ConverterInterface $converter;
     private HttpClientInterface $httpClient;
