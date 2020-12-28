@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 
-namespace Proxy\OAuth\Actions\Type;
+namespace Proxy\OAuth\Action\Type;
 
 
 use Webmozart\Assert\Assert;

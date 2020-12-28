@@ -3,16 +3,15 @@
 declare(strict_types=1);
 
 
-namespace Proxy\OAuth\Actions;
+namespace Proxy\OAuth\Action;
 
-use Exception;
-use Proxy\OAuth\Actions\Type\PasswordType;
-use Proxy\OAuth\Actions\Type\UsernameType;
+use Proxy\OAuth\Action\Type\PasswordType;
+use Proxy\OAuth\Action\Type\UsernameType;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
 use Proxy\OAuth\Interfaces\ConverterInterface;
 use Proxy\OAuth\Interfaces\HttpClientInterface;
 
-class AuthAction
+class LoginAction
 {
     private ConverterInterface $converter;
     private HttpClientInterface $httpClient;
@@ -28,7 +27,7 @@ class AuthAction
         $this->configStore = $configStore;
     }
 
-    public function login(UsernameType $username, PasswordType $password)
+    public function login(UsernameType $username, PasswordType $password): array
     {
         $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
         $loginUrl = trim($this->configStore->get('OAUTH_URL'), '/');
@@ -45,14 +44,8 @@ class AuthAction
             'domain' => $this->configStore->get('OAUTH_DOMAIN')
         ];
 
-        try {
-            $responseClient = $this->httpClient->post($url, $body)->getBody()->getContents();
-        } catch (Exception $e) {
-            return [
-                'message' => json_decode($e->getResponse()->getBody()->getContents())->message,
-                'code' => $e->getCode()
-            ];
-        }
+        $responseClient = $this->httpClient->post($url, $body)->getBody()->getContents();
+
         return $this->converter->fromJWTToFrontend($responseClient);
     }
 }

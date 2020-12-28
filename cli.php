@@ -1,8 +1,8 @@
 <?php
 
-use Proxy\OAuth\Actions\AuthAction;
-use Proxy\OAuth\Actions\Type\PasswordType;
-use Proxy\OAuth\Actions\Type\UsernameType;
+use Proxy\OAuth\Action\AuthAction;
+use Proxy\OAuth\Action\Type\PasswordType;
+use Proxy\OAuth\Action\Type\UsernameType;
 use Proxy\OAuth\Helpers\DotEnvConfigStorage;
 use Proxy\OAuth\Helpers\GuzzleHttpClient;
 use Proxy\OAuth\Interfaces\ConverterInterface;

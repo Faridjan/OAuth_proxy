@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-use Proxy\OAuth\Actions\AuthAction;
-use Proxy\OAuth\Actions\AccessAction;
-use Proxy\OAuth\Actions\Type\PasswordType;
-use Proxy\OAuth\Actions\Type\UsernameType;
+use Proxy\OAuth\Action\LoginAction;
+use Proxy\OAuth\Action\AccessAction;
+use Proxy\OAuth\Action\LogoutAction;
+use Proxy\OAuth\Action\Type\PasswordType;
+use Proxy\OAuth\Action\Type\UsernameType;
 use Proxy\OAuth\Helpers\DotEnvConfigStorage;
 use Proxy\OAuth\Helpers\GuzzleHttpClient;
 use Proxy\OAuth\Interfaces\ConverterInterface;
@@ -23,29 +24,25 @@ $configStore->load();
 
 
 #-------------------------------------
-//$authAction = new AuthAction($converter, $httpClient, $configStore);
+//$authAction = new LoginAction($converter, $httpClient, $configStore);
 //
 //$username = new UsernameType('tyanrv');
 //$password = new PasswordType('hash');
 //
 //print_r($authAction->login($username, $password));
-
+////
 
 #-------------------------------------
-$token = [
-    "token_type" => 'Bearer',
-    "expires_in" => "60",
-    "access_token" => "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJhcHAiLCJqdGkiOiI3ZGQ0MjZhMThkODk3YWZhOWJjOTBlMzE2MmEyNzA2ZGI5NTUzMzRkMDY1M2QzNzFjMDg0NmZmY2U4MzU5ZjAxYmY4YzI4ZjlmODY1ZGNmMiIsImlhdCI6IjE2MDkxNTE4MjMuNTI5ODg1IiwibmJmIjoiMTYwOTE1MTgyMy41Mjk4OTUiLCJleHAiOiIxNjA5MTUxODgzLjUxNTY4MCIsInN1YiI6ImIwNWJmZjkyLTkzZmYtNGU4Mi1hNjhiLWFkZjAxZjQ4ZjM4OCIsInNjb3BlcyI6W10sImRvbWFpbl9pZCI6IjdhNzhhZDRlLTVkZTQtNDViOC05MzZmLTBlNDdiNWYwMjVmNSJ9.4Kv1vqmMktJPX7dBaM8FJoktqvV4iPSfhStqXBYJq1Zps4YmMAuBrYwlqLb32muBgr8jIjoPj1jlTJdOogs3qTeKUILX_MTusOxzQR9166xAEVx52KdqQV1e9NGQd-i_KHGHv0zwVmMUF5ypF46iLBzQdIROEtFWBZqtjToDjHQa91AxGT1-M737rmh4dRFBmlytJ2G8U2pXodO1Xx4cZ_18pSLTeb2kAGzyQT3wuB3PbEXM5zobx6Mi_wsN7WFxZSf1gavMq_64sZ2ovN0d6vS4DpCOsIZWA9-gTZAC8EE30wEeD3Nzpz0Y1O_ExOtmv7CORm9M_C9mChB7QiVW5Q",
-    "refresh_token" => "def50200b408883210d11836844e7cc70bd3337f397cb75c98c46b2d17952790ad82c14648c7cd53bf5ea1217279e8180d6b59f3187821c96e13d5a1410c01229c65f09c6b451204582b4d9f0e9522edca42b3a9df858ca7e6ee9e6249cb0c6515c8da463b86d789d899f6e5930df425ea5b8980d605d720ec79ca5837007b2c68273e67edfbbf7a069227a2272909b8958a19995a4e1c54073b26a605eb9d0e1fdfdfe50830dc9664199fc4b56c7f1b5f2f397c3527bd908658e852392e29f99ab480aa766a9978d21e1e9d3eb7861e3fef6256360509e69deb1e6bc4694036427fb8a01bfc196f708e190db3574574758a679636d68af34d3384abb0e38cc73fa86137c0a09ca5f7023a8801716549e0c8d91e071549b73ec979c766f82a4a4f4b14ecb81e40134adfff5226d0170283ac79f0ac9a0b7546554206572fb439342152ee91a69c6e7c887cda8fef2fa0acaefbc98505594b83c722e23a2e02a06299e45747db986e720d5bd251892fe65d1530a174a6641057d9031f7d662d650ab376c590d0dbc09e2a3718d86442b72fd2e02c553d598907b216a5a4d321aca2341b338065eb9669c242e3a0c54430ade0e9b13e4b7a6399b697"
-];
-$refreshAction = new AccessAction($converter, $httpClient, $configStore, $token);
-
-// REFRESH
-print_r(
-    $refreshAction->refresh()
-);
-
-// CHECK
-//print_r(
-//    $refreshAction->check()
-//);
+//$token = [
+//    "token_type" => 'Bearer',
+//    "expires_in" => "60",
+//    "access_token" => "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJhcHAiLCJqdGkiOiJmYzRmMmViMmExZWRhNzllZmRlYjY5MGE3YTlmZmYwZmNjYWI4MTRlZjRiMWQyMjQ2YTE5YjVjMjM0OTU4M2VlMTRjZGQ1ZjkyYzZlMTc5NyIsImlhdCI6IjE2MDkxNjQ4NzEuMDQwNTkwIiwibmJmIjoiMTYwOTE2NDg3MS4wNDA2MDEiLCJleHAiOiIxNjA5MTY0OTMxLjAyODM1MCIsInN1YiI6ImIwNWJmZjkyLTkzZmYtNGU4Mi1hNjhiLWFkZjAxZjQ4ZjM4OCIsInNjb3BlcyI6W10sImRvbWFpbl9pZCI6IjdhNzhhZDRlLTVkZTQtNDViOC05MzZmLTBlNDdiNWYwMjVmNSJ9.gQcpakvHP_QqFK1aKTUSnCjAAWj_uW3X-EUmebg5TKUC7qOm5KMy46OpUB4qhI7IlcfPR6FV7TnE49KK7b1xVGqIya19V2iXLTjDnScjH2oIfr14-kMsqpZWoYaiHYzGjX5RtTt2SomvXiPn3FD2o0SQuW4jOTIeZ1ZsFoes54MgDlswSFqvMCXhuu8CsFJqDrjq1b-GeOZycsZcGspBpeRO4LRzqcq1BStGVVsSkAAgcTNLhIw4Yjk6c2Oergt8OSbk3NgOQoAg8CyI5dphQkagFRpOzKysK9tSkQjbQz_tBmKJcTtK0Hj5X6T5P9E5Q8vd3X4AqG8ku5XNcGAIAw",
+//    "refresh_token" => "def50200477cbe918be32dad8ba087229183aa22cb9da6149cb9762b79f9927c74ee4ed97d965c6fb8f0f754127e76de9bbf9d6c860280a6f9028226861805ecfeaa04fb4c8f13c0dde33a6066c8cfbba24280819f1c5585942c67b5384c8417158d4652c4f9da555d432016a85d81afd991f84eefcbd6782ec68f7182887dd7a07964c85d5dd0cb4663f935324f2b9399fa444861d9147eef7a22d9be4cea631f364ed67dbf7c75ed701150a0594c0967338483798d89b1fff52eb96a1422cf5e60845a543a399fb839c0d5abafc9c0d9972ae4ce8a6d7aa7091827ae517e030f496f8004d357abc24d7ff22ff375b20196de88716eb9443930df24f5134e8b6008aa446a94356bb198c58c1595e9cfd5fb64f9d1a7ee78fe1afe612d4f5d690c84d3cde3b078f6c050fb8e8ac873ce187593918ba0b1824003f613381c255acbc526eebbb80fead2a3213be713024671fb4a92c9fdacba9ff8e7eb3d9d1491eac571ef67f4da71b192df081eb51a1cf397f2541ec363a17c3715b5ef73cc65085fd6594cafeb91f0fd8c9ed1a3dcdcd7a2110f63a6cb1edcdebda07aff5c4dfa2d0ac64e1d652c3393150c4b3aaa4211ecdfc688d7a253538567"
+//];
+//$refreshAction = new AccessAction($converter, $httpClient, $configStore, $token);
+//
+//print_r($refreshAction());
+//
+//$logout = new LogoutAction($converter, $httpClient, $configStore, $token, $refreshAction);
+//
+//var_dump($logout->logout());

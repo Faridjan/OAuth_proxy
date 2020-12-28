@@ -1,11 +1,13 @@
 # OAuth_proxy
-proxy actions: 
-- LoginAction::class
-- LogoutAction::class
-- AccessAction::class
-- AuthAction::class
 
-# Example 
+proxy handlers:
+
+- LoginHandler::class
+- LogoutHandler::class
+- AccessHandler::class
+
+# Example
+
 ```php
 <?php
 
@@ -17,7 +19,7 @@ $configStore = new DotEnvConfigStorage(__DIR__ . '/../');
 $configStore->load();
 ```
 
-.env example 
+.env example
 
 ```env
 OAUTH_BASE_URL="http://172.17.0.1:8080"
