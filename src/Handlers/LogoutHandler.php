@@ -17,28 +17,43 @@ class LogoutHandler
     private HttpClientInterface $httpClient;
     private ConfigStoreInterface $configStore;
 
-    private array $token;
+    private array $authData;
 
     public function __construct(
         ConverterInterface $converter,
         HttpClientInterface $httpClient,
         ConfigStoreInterface $configStore,
-        array $token
+        array $authData
     ) {
         $this->converter = $converter;
         $this->httpClient = $httpClient;
         $this->configStore = $configStore;
-        $this->token = $token;
+        $this->authData = $authData;
     }
 
-    public function getToken(): array
+    public function getAuthData(): array
     {
-        return $this->token;
+        return $this->authData;
     }
 
-    public function setToken(array $token): void
+    public function setAuthData(array $authData): void
     {
-        $this->token = $token;
+        $this->authData = $authData;
     }
 
+    public function logout(): void
+    {
+        $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
+        $checkUrl = trim($this->configStore->get('OAUTH_LOGOUT_URL'), '/');
+
+        $url = $baseUrl . '/' . $checkUrl;
+
+        $decryptedToken = json_decode($this->converter->fromFrontendToJWT($this->authData), true);
+
+        $headers = [
+            'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedToken['access_token']
+        ];
+
+        $this->httpClient->process('GET', $url, [], $headers);
+    }
 }
