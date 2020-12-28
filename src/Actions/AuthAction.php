@@ -49,19 +49,10 @@ class AuthAction
             $responseClient = $this->httpClient->post($url, $body);
         } catch (Exception $e) {
             return [
-                'message' => $e->getMessage(),
+                'message' => json_decode($e->getResponse()->getBody()->getContents())->message,
                 'code' => $e->getCode()
             ];
         }
-
-
-        $this->converter->to(
-            [
-                'access_token' => $responseClient->access_token,
-                'refresh_token' => $responseClient->refresh_token,
-            ]
-        );
-
-        return $responseClient;
+        return $this->converter->fromJWTToFrontend($responseClient);
     }
 }

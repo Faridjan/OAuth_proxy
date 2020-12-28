@@ -8,7 +8,7 @@ namespace Proxy\OAuth\Interfaces;
 
 interface ConverterInterface
 {
-    public function from(string $token): string;
+    public function fromFrontendToJWT(array $auth): string;
 
-    public function to(array $tokenChunks): string;
+    public function fromJWTToFrontend(string $jwt): array;
 }

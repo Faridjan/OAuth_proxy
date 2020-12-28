@@ -14,12 +14,12 @@ class GuzzleHttpClient implements HttpClientInterface
 
     public function get(string $url, array $body = [], array $headers = [])
     {
-        return json_decode($this->process('GET', $url, $body, $headers));
+        return $this->process('GET', $url, $body, $headers);
     }
 
     public function post(string $url, array $body = [], array $headers = [])
     {
-        return json_decode($this->process('POST', $url, $body, $headers));
+        return $this->process('POST', $url, $body, $headers);
     }
 
     public function process(string $method, string $url, array $body = [], array $headers = [])

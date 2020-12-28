@@ -11,19 +11,20 @@ use Proxy\OAuth\Interfaces\ConverterInterface;
 class JWTConverter implements ConverterInterface
 {
 
-    public function from(string $token): string
+    public function fromFrontendToJWT(array $auth): string
     {
-        // TODO: Implement from() method.
-//        $decodedToken = base64_decode($token);
-//        $arrayToken = explode('__SEPARATOR__', $decodedToken);
-        return $token;
+//        return implode('__SEPARATOR___', $auth);
+        return json_encode($auth);
     }
 
-    public function to(array $token): string
+
+    public function fromJWTToFrontend(string $jwt): array
     {
         // TODO: Implement to() method.
 //        $joinedToken = join('__SEPARATOR__', $token);
 //        $encodeToken = base64_encode($joinedToken);
-        return $token['refresh_token'];
+//        return explode('__SEPARATOR___', $jwt);
+
+        return json_decode($jwt, true);
     }
 }
