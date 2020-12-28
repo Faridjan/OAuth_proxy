@@ -10,22 +10,28 @@ use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Proxy\OAuth\Interfaces\HttpClientInterface;
+use Psr\Http\Message\ResponseInterface;
 
 class GuzzleHttpClient implements HttpClientInterface
 {
 
-    public function get(string $url, array $body = [], array $headers = [], array $options = [])
+    public function get(string $url, array $body = [], array $headers = [], array $options = []): ResponseInterface
     {
         return $this->process('GET', $url, $body, $headers, $options);
     }
 
-    public function post(string $url, array $body = [], array $headers = [], array $options = [])
+    public function post(string $url, array $body = [], array $headers = [], array $options = []): ResponseInterface
     {
         return $this->process('POST', $url, $body, $headers, $options);
     }
 
-    public function process(string $method, string $url, array $body = [], array $headers = [], array $options = [])
-    {
+    public function process(
+        string $method,
+        string $url,
+        array $body = [],
+        array $headers = [],
+        array $options = []
+    ): ResponseInterface {
         $client = new Client();
 
         try {
