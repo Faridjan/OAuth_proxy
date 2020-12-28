@@ -16,19 +16,21 @@ class LogoutHandler
     private ConverterInterface $converter;
     private HttpClientInterface $httpClient;
     private ConfigStoreInterface $configStore;
-
     private array $authData;
+    private AccessHandler $accessHandler;
 
     public function __construct(
         ConverterInterface $converter,
         HttpClientInterface $httpClient,
         ConfigStoreInterface $configStore,
-        array $authData
+        array $authData,
+        AccessHandler $accessHandler
     ) {
         $this->converter = $converter;
         $this->httpClient = $httpClient;
         $this->configStore = $configStore;
         $this->authData = $authData;
+        $this->accessHandler = $accessHandler;
     }
 
     public function getAuthData(): array
@@ -54,6 +56,20 @@ class LogoutHandler
             'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedToken['access_token']
         ];
 
-        $this->httpClient->process('GET', $url, [], $headers);
+        $response = $this->httpClient->process('POST', $url, [], $headers);
+
+        if ($response->getStatusCode() === 400) {
+            $response = $this->accessHandler->refresh($decryptedToken['refresh_token']);
+        }
+
+        $data = json_decode((string) $response->getBody(), true);
+
+
+        $headers2 = [
+            'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $data['access_token']
+        ];
+
+        $this->httpClient->process('GET', $url, [], $headers2);
+
     }
 }
