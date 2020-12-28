@@ -3,6 +3,7 @@ proxy actions:
 - LoginAction::class
 - LogoutAction::class
 - AccessAction::class
+- AuthAction::class
 
 # Example 
 ```php
