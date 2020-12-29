@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-
 namespace Proxy\OAuth\Action;
 
-
-use Exception;
+use Proxy\OAuth\Helpers\GuzzleHttpClient;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
 use Proxy\OAuth\Interfaces\ConverterInterface;
 use Proxy\OAuth\Interfaces\HttpClientInterface;
@@ -18,20 +16,22 @@ class LogoutAction
     private HttpClientInterface $httpClient;
     private ConfigStoreInterface $configStore;
     private array $authData;
-    private AccessAction $accessHandler;
+    private string $url;
 
     public function __construct(
         ConverterInterface $converter,
-        HttpClientInterface $httpClient,
         ConfigStoreInterface $configStore,
         array $authData,
-        AccessAction $accessHandler
+        HttpClientInterface $httpClient = null
     ) {
         $this->converter = $converter;
-        $this->httpClient = $httpClient;
         $this->configStore = $configStore;
         $this->authData = $authData;
-        $this->accessHandler = $accessHandler;
+        $this->httpClient = $httpClient ?? new GuzzleHttpClient();
+
+        $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
+        $checkUrl = trim($this->configStore->get('OAUTH_LOGOUT_URL'), '/');
+        $this->url = $baseUrl . '/' . $checkUrl;
     }
 
     public function getAuthData(): array
@@ -44,39 +44,45 @@ class LogoutAction
         $this->authData = $authData;
     }
 
-    public function logout(): bool
+    public function execute(): bool
     {
-        $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
-        $checkUrl = trim($this->configStore->get('OAUTH_LOGOUT_URL'), '/');
+        if (!$this->logoutByAuthData()) {
+            return $this->logoutByRefreshToken();
+        }
 
-        $url = $baseUrl . '/' . $checkUrl;
+        return true;
+    }
 
+    private function logoutByAuthData(): bool
+    {
         $decryptedToken = json_decode($this->converter->fromFrontendToJWT($this->getAuthData()), true);
 
         $headers = [
             'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedToken['access_token']
         ];
 
-        $response = $this->httpClient->post($url, [], $headers, ['http_errors' => false]);
+        $response = $this->httpClient->post($this->url, [], $headers, ['http_errors' => false]);
 
         if ($response->getStatusCode() === 200) {
             return true;
         }
 
-        if ($response->getStatusCode() === 400) {
-            $responseBody = $this->accessHandler->refresh($decryptedToken['refresh_token']);
-            $data = json_decode((string)$responseBody, true);
+        return false;
+    }
 
-            $headers = [
-                'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $data['access_token']
-            ];
+    private function logoutByRefreshToken(): bool
+    {
+        $decryptedToken = json_decode($this->converter->fromFrontendToJWT($this->getAuthData()), true);
 
-            $response = $this->httpClient->post($url, [], $headers);
-        }
+        $jwtFromRefresh = (new RefreshAction($this->configStore, $this->httpClient))
+            ->refresh($decryptedToken['refresh_token']);
+        $jwt = json_decode((string)$jwtFromRefresh, true);
 
-        if ($response->getStatusCode() !== 200) {
-            throw new Exception('Some Exception text.');
-        }
+        $headers = [
+            'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $jwt['access_token']
+        ];
+
+        $this->httpClient->post($this->url, [], $headers);
 
         return true;
     }

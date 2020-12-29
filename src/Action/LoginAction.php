@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-
 namespace Proxy\OAuth\Action;
 
 use Proxy\OAuth\Action\Type\PasswordType;
 use Proxy\OAuth\Action\Type\UsernameType;
+use Proxy\OAuth\Helpers\GuzzleHttpClient;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
 use Proxy\OAuth\Interfaces\ConverterInterface;
 use Proxy\OAuth\Interfaces\HttpClientInterface;
@@ -17,23 +17,25 @@ class LoginAction
     private HttpClientInterface $httpClient;
     private ConfigStoreInterface $configStore;
 
+    private string $url;
+
     public function __construct(
         ConverterInterface $converter,
-        HttpClientInterface $httpClient,
-        ConfigStoreInterface $configStore
+        ConfigStoreInterface $configStore,
+        HttpClientInterface $httpClient = null
     ) {
         $this->converter = $converter;
-        $this->httpClient = $httpClient;
         $this->configStore = $configStore;
+        $this->httpClient = $httpClient ?? new GuzzleHttpClient();
+
+        $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
+        $loginUrl = trim($this->configStore->get('OAUTH_URL'), '/');
+
+        $this->url = $baseUrl . '/' . $loginUrl;
     }
 
     public function login(UsernameType $username, PasswordType $password): array
     {
-        $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
-        $loginUrl = trim($this->configStore->get('OAUTH_URL'), '/');
-
-        $url = $baseUrl . '/' . $loginUrl;
-
         $body = [
             'grant_type' => $this->configStore->get('OAUTH_GRANT_TYPE'),
             'username' => $username->getValue(),
@@ -44,7 +46,7 @@ class LoginAction
             'domain' => $this->configStore->get('OAUTH_DOMAIN')
         ];
 
-        $responseClient = $this->httpClient->post($url, $body)->getBody()->getContents();
+        $responseClient = $this->httpClient->post($this->url, $body)->getBody()->getContents();
 
         return $this->converter->fromJWTToFrontend($responseClient);
     }

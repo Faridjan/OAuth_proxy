@@ -17,7 +17,4 @@
     </rule>
     <!-- Paths to check -->
     <file>src</file>
-    <file>bin</file>
-    <file>config</file>
-    <file>public</file>
 </ruleset>
