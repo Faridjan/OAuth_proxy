@@ -27,7 +27,7 @@ class AccessAction
         $this->authData = $authData;
         $this->converter = $converter;
         $this->configStore = $configStore;
-        $this->httpClient = $httpClient ?? new GuzzleHttpClient();;
+        $this->httpClient = $httpClient ?? new GuzzleHttpClient();
     }
 
     public function __invoke(): array
@@ -36,8 +36,9 @@ class AccessAction
         $decryptedAuthData = json_decode($this->converter->fromFrontendToJWT($authData), true);
 
         if (!$this->check()) {
-            $responseClient = $this->refresh($decryptedAuthData['refresh_token']);
-            return $this->converter->fromJWTToFrontend($responseClient);
+            $jwtFromRefresh = (new RefreshAction($this->configStore, $this->httpClient))
+                ->refresh($decryptedAuthData['refresh_token']);
+            return $this->converter->fromJWTToFrontend($jwtFromRefresh);
         }
         return $authData;
     }

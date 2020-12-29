@@ -9,40 +9,50 @@ use Proxy\OAuth\Action\Type\PasswordType;
 use Proxy\OAuth\Action\Type\UsernameType;
 use Proxy\OAuth\Helpers\DotEnvConfigStorage;
 use Proxy\OAuth\Helpers\GuzzleHttpClient;
-use Proxy\OAuth\Interfaces\ConverterInterface;
-use Proxy\OAuth\JWTConverter;
 
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$converter = new JWTConverter();
+class MyConverter implements \Proxy\OAuth\Interfaces\ConverterInterface {
+
+    public function fromFrontendToJWT(array $auth): string
+    {
+        return json_encode($auth);
+    }
+
+    public function fromJWTToFrontend(string $jwt): array
+    {
+        return json_decode($jwt, true);
+    }
+}
 
 $httpClient = new GuzzleHttpClient();
 
 $configStore = new DotEnvConfigStorage(__DIR__ . '/../');
 $configStore->load();
 
+$converter = new MyConverter();
 
 #-------------------------------------
-//$authAction = new LoginAction($converter, $httpClient, $configStore);
+//$authAction = new LoginAction($converter, $configStore, $httpClient);
 //
 //$username = new UsernameType('tyanrv');
 //$password = new PasswordType('hash');
 //
 //print_r($authAction->login($username, $password));
-////
+//
 
 #-------------------------------------
-//$token = [
-//    "token_type" => 'Bearer',
-//    "expires_in" => "60",
-//    "access_token" => "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJhcHAiLCJqdGkiOiJmYzRmMmViMmExZWRhNzllZmRlYjY5MGE3YTlmZmYwZmNjYWI4MTRlZjRiMWQyMjQ2YTE5YjVjMjM0OTU4M2VlMTRjZGQ1ZjkyYzZlMTc5NyIsImlhdCI6IjE2MDkxNjQ4NzEuMDQwNTkwIiwibmJmIjoiMTYwOTE2NDg3MS4wNDA2MDEiLCJleHAiOiIxNjA5MTY0OTMxLjAyODM1MCIsInN1YiI6ImIwNWJmZjkyLTkzZmYtNGU4Mi1hNjhiLWFkZjAxZjQ4ZjM4OCIsInNjb3BlcyI6W10sImRvbWFpbl9pZCI6IjdhNzhhZDRlLTVkZTQtNDViOC05MzZmLTBlNDdiNWYwMjVmNSJ9.gQcpakvHP_QqFK1aKTUSnCjAAWj_uW3X-EUmebg5TKUC7qOm5KMy46OpUB4qhI7IlcfPR6FV7TnE49KK7b1xVGqIya19V2iXLTjDnScjH2oIfr14-kMsqpZWoYaiHYzGjX5RtTt2SomvXiPn3FD2o0SQuW4jOTIeZ1ZsFoes54MgDlswSFqvMCXhuu8CsFJqDrjq1b-GeOZycsZcGspBpeRO4LRzqcq1BStGVVsSkAAgcTNLhIw4Yjk6c2Oergt8OSbk3NgOQoAg8CyI5dphQkagFRpOzKysK9tSkQjbQz_tBmKJcTtK0Hj5X6T5P9E5Q8vd3X4AqG8ku5XNcGAIAw",
-//    "refresh_token" => "def50200477cbe918be32dad8ba087229183aa22cb9da6149cb9762b79f9927c74ee4ed97d965c6fb8f0f754127e76de9bbf9d6c860280a6f9028226861805ecfeaa04fb4c8f13c0dde33a6066c8cfbba24280819f1c5585942c67b5384c8417158d4652c4f9da555d432016a85d81afd991f84eefcbd6782ec68f7182887dd7a07964c85d5dd0cb4663f935324f2b9399fa444861d9147eef7a22d9be4cea631f364ed67dbf7c75ed701150a0594c0967338483798d89b1fff52eb96a1422cf5e60845a543a399fb839c0d5abafc9c0d9972ae4ce8a6d7aa7091827ae517e030f496f8004d357abc24d7ff22ff375b20196de88716eb9443930df24f5134e8b6008aa446a94356bb198c58c1595e9cfd5fb64f9d1a7ee78fe1afe612d4f5d690c84d3cde3b078f6c050fb8e8ac873ce187593918ba0b1824003f613381c255acbc526eebbb80fead2a3213be713024671fb4a92c9fdacba9ff8e7eb3d9d1491eac571ef67f4da71b192df081eb51a1cf397f2541ec363a17c3715b5ef73cc65085fd6594cafeb91f0fd8c9ed1a3dcdcd7a2110f63a6cb1edcdebda07aff5c4dfa2d0ac64e1d652c3393150c4b3aaa4211ecdfc688d7a253538567"
-//];
-//$refreshAction = new AccessAction($converter, $httpClient, $configStore, $token);
-//
-//print_r($refreshAction());
-//
-//$logout = new LogoutAction($converter, $httpClient, $configStore, $token, $refreshAction);
-//
-//var_dump($logout->logout());
+$token = [
+    "token_type" => 'Bearer',
+    "expires_in" => "60",
+    "access_token" => "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJhcHAiLCJqdGkiOiIxYTIyYzE1MjUyZTk2MGFmOGQxOTQzYzM1MzY0MmRiMzNkY2NjMzA3OGRkZjMzMGI4ZDc5NjY2MDY4YzY5ZjU1MGVlODExNjhlZmU5ZTQ5ZiIsImlhdCI6IjE2MDkyMjE3MzEuMzcyNDkyIiwibmJmIjoiMTYwOTIyMTczMS4zNzI1MzUiLCJleHAiOiIxNjA5MjIyNjMxLjA4MTAyNCIsInN1YiI6IjlkMDc4ZWZkLTlmM2QtNDE3Zi05YmE3LTgwYzlkMDk4MWM0MiIsInNjb3BlcyI6W10sImRvbWFpbl9pZCI6IjUxMTZlOTNlLWI0NGYtNDcyZS04YTcyLWM3ZTQ4YzcyN2FlMiJ9.GCHSiY0__pjVr9UOeUiBeUHrvf5bC5e4FDgYSeQERhiiX3CyEiZZtm_ia8WryVgZvLMTeopbc1plC_MH5L2n5KCvHkaFrcM0Dq781Me5Q2fZNYSDisX462M-sKIY8W8FZA6lyjs2YHKxnCmyknvfbTK3-qRa441MR5J06AgV-DB2AUiiXqHwH9CeBwrS5g_nsCKS2L5-_C8yS-ObdVKj1GlWzV-pn75axBwZAaIH8A7BuLdsPODYWaMDEh7xcPTITDvH53TmNLFZidG0zpidMyr0f-ke9Le0LrOsl4qimgdqL8z5vNtLB9y_6vMKMSCcD6YF3TLHWoFdXMYj0bkrzQ",
+    "refresh_token" => "def50200ce7fcf5d7546cd7c190149c52bfac621bcf44c1c6cdc54e61e2c061acd7eba50ba46d5d2303b48db7828c4c54991bdc20dd629894c31497fd7caa9f60b73652575364cfe2d7e241e986993c2ab2c7bf7870edb34ad15847e39e84da5c19d5db0115fc17dc3666e2986e28267a4b350502b30df9d9b1ef92cbc252ac7d1bace15b82ed288eabb4514c3482cbd025a549b40556dd4ab8cb251e54f94c8c88b3b5a6de62257de38c651446de9e0787aee0a4fca2ff83a37ee812257b8ee4144b3f393b9fed7dc56afd4f27ac8cf1dc00a0e5e8a0e8db8507cf128f475d796eebae924cef1ea8b22aa0969b5685ed7cbd00ae19f942b960e18dc0297b2b1f487adb55e6ec596f9c7758dc266a6481aa93fccee421434a371c4eac69230a22070af69340da6821f438ad3d7778c209cfd2daa51d633706f363b4437baaae5c4441a0516386726b0cba13101b1caaee66a510e2a6a123578435d8cbe85970118ba9a08947f7a1c625bc76bbd377882f2cc9e2ab1bc3045ecd00896e0dfa11a092894018eea07426f72b4afb3ad0be59f5fba7b1a55a4f6ae9d90cf6f4ac23a6e039bec22bb462b048f34c4ef3fd76b44dee657b6c635b80c85ee"
+];
+$accessAction = new AccessAction($converter, $configStore, $token);
+
+print_r($accessAction());
+
+$logout = new LogoutAction($converter, $configStore, $token);
+
+var_dump($logout->logout());

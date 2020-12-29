@@ -7,6 +7,7 @@ namespace Proxy\OAuth\Action;
 
 use Proxy\OAuth\Action\Type\PasswordType;
 use Proxy\OAuth\Action\Type\UsernameType;
+use Proxy\OAuth\Helpers\GuzzleHttpClient;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
 use Proxy\OAuth\Interfaces\ConverterInterface;
 use Proxy\OAuth\Interfaces\HttpClientInterface;
@@ -19,12 +20,12 @@ class LoginAction
 
     public function __construct(
         ConverterInterface $converter,
-        HttpClientInterface $httpClient,
-        ConfigStoreInterface $configStore
+        ConfigStoreInterface $configStore,
+        HttpClientInterface $httpClient = null
     ) {
         $this->converter = $converter;
-        $this->httpClient = $httpClient;
         $this->configStore = $configStore;
+        $this->httpClient = $httpClient ?? new GuzzleHttpClient();
     }
 
     public function login(UsernameType $username, PasswordType $password): array

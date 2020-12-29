@@ -7,6 +7,7 @@ namespace Proxy\OAuth\Action;
 
 
 use Exception;
+use Proxy\OAuth\Helpers\GuzzleHttpClient;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
 use Proxy\OAuth\Interfaces\ConverterInterface;
 use Proxy\OAuth\Interfaces\HttpClientInterface;
@@ -18,20 +19,17 @@ class LogoutAction
     private HttpClientInterface $httpClient;
     private ConfigStoreInterface $configStore;
     private array $authData;
-    private AccessAction $accessHandler;
 
     public function __construct(
         ConverterInterface $converter,
-        HttpClientInterface $httpClient,
         ConfigStoreInterface $configStore,
         array $authData,
-        AccessAction $accessHandler
+        HttpClientInterface $httpClient = null
     ) {
         $this->converter = $converter;
-        $this->httpClient = $httpClient;
         $this->configStore = $configStore;
         $this->authData = $authData;
-        $this->accessHandler = $accessHandler;
+        $this->httpClient = $httpClient ?? new GuzzleHttpClient();
     }
 
     public function getAuthData(): array
@@ -64,8 +62,9 @@ class LogoutAction
         }
 
         if ($response->getStatusCode() === 400) {
-            $responseBody = $this->accessHandler->refresh($decryptedToken['refresh_token']);
-            $data = json_decode((string)$responseBody, true);
+            $jwtFromRefresh = (new RefreshAction($this->configStore, $this->httpClient))
+                ->refresh($decryptedToken['refresh_token']);
+            $data = json_decode((string)$jwtFromRefresh, true);
 
             $headers = [
                 'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $data['access_token']
