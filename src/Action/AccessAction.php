@@ -18,6 +18,8 @@ class AccessAction
 
     private array $authData;
 
+    private string $url;
+
     public function __construct(
         ConverterInterface $converter,
         ConfigStoreInterface $configStore,
@@ -28,6 +30,12 @@ class AccessAction
         $this->converter = $converter;
         $this->configStore = $configStore;
         $this->httpClient = $httpClient ?? new GuzzleHttpClient();
+
+
+        $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
+        $checkUrl = trim($this->configStore->get('OAUTH_CHECK_URL'), '/');
+
+        $this->url = $baseUrl . '/' . $checkUrl;
     }
 
     public function __invoke(): array
@@ -46,10 +54,6 @@ class AccessAction
     public function check(): bool
     {
         $authData = $this->getAuthData();
-        $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
-        $checkUrl = trim($this->configStore->get('OAUTH_CHECK_URL'), '/');
-
-        $url = $baseUrl . '/' . $checkUrl;
 
         $decryptedAuthData = json_decode($this->converter->fromFrontendToJWT($authData), true);
 
@@ -57,27 +61,10 @@ class AccessAction
             'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedAuthData['access_token'],
         ];
 
-        $responseClient = $this->httpClient->get($url, [], $headers, ['http_errors' => false]);
+        $responseClient = $this->httpClient->get($this->url, [], $headers, ['http_errors' => false]);
 
 
         return $responseClient->getStatusCode() === 200;
-    }
-
-    public function refresh(string $refreshToken): string
-    {
-        $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
-        $loginUrl = trim($this->configStore->get('OAUTH_URL'), '/');
-
-        $url = $baseUrl . '/' . $loginUrl;
-
-        $body = [
-            'grant_type' => $this->configStore->get('OAUTH_REFRESH_GRANT_TYPE'),
-            'refresh_token' => $refreshToken,
-            'client_id' => $this->configStore->get('OAUTH_CLIENT_ID'),
-            'client_secret' => $this->configStore->get('OAUTH_CLIENT_SECRET'),
-        ];
-
-        return $this->httpClient->post($url, $body, [])->getBody()->getContents();
     }
 
     public function getAuthData(): array
