@@ -2,11 +2,8 @@
 
 declare(strict_types=1);
 
-
 namespace Proxy\OAuth\Action;
 
-
-use Exception;
 use Proxy\OAuth\Helpers\GuzzleHttpClient;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
 use Proxy\OAuth\Interfaces\ConverterInterface;

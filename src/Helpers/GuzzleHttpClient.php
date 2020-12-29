@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-
 namespace Proxy\OAuth\Helpers;
-
 
 use Exception;
 use GuzzleHttp\Client;
@@ -45,7 +43,6 @@ class GuzzleHttpClient implements HttpClientInterface
                     ],
                     $options
                 )
-
             );
         } catch (ClientException $e) {
             throw new Exception(

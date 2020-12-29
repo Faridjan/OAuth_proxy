@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Proxy\OAuth\Action;
 
 use Proxy\OAuth\Helpers\GuzzleHttpClient;
@@ -76,6 +75,4 @@ class AccessAction
     {
         $this->authData = $authData;
     }
-
-
 }

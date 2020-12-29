@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Proxy\OAuth\Interfaces;
 
 use Psr\Http\Message\ResponseInterface;
