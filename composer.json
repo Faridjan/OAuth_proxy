@@ -8,12 +8,12 @@
   },
   "require": {
     "php": ">=7.4.0",
-    "ext-json": "*"
+    "ext-json": "*",
+    "guzzlehttp/guzzle": "^7.2",
+    "vlucas/phpdotenv": "^5.2"
   },
   "require-dev": {
-    "guzzlehttp/guzzle": "^7.2",
     "roave/security-advisories": "dev-latest",
-    "vlucas/phpdotenv": "^5.2",
     "webmozart/assert": "^1.9"
   },
   "autoload": {
