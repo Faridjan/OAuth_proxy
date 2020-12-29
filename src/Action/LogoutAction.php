@@ -15,18 +15,15 @@ class LogoutAction
     private ConverterInterface $converter;
     private HttpClientInterface $httpClient;
     private ConfigStoreInterface $configStore;
-    private array $authData;
     private string $url;
 
     public function __construct(
         ConverterInterface $converter,
         ConfigStoreInterface $configStore,
-        array $authData,
         HttpClientInterface $httpClient = null
     ) {
         $this->converter = $converter;
         $this->configStore = $configStore;
-        $this->authData = $authData;
         $this->httpClient = $httpClient ?? new GuzzleHttpClient();
 
         $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
@@ -34,31 +31,21 @@ class LogoutAction
         $this->url = $baseUrl . '/' . $checkUrl;
     }
 
-    public function getAuthData(): array
+    public function execute($authData): bool
     {
-        return $this->authData;
-    }
+        $decryptedAuthData = json_decode($this->converter->fromFrontendToJWT($authData), true);
 
-    public function setAuthData(array $authData): void
-    {
-        $this->authData = $authData;
-    }
-
-    public function execute(): bool
-    {
-        if (!$this->logoutByAuthData()) {
-            return $this->logoutByRefreshToken();
+        if (!$this->logoutByAuthData($decryptedAuthData['access_token'])) {
+            return $this->logoutByRefreshToken($decryptedAuthData['refresh_token']);
         }
 
         return true;
     }
 
-    private function logoutByAuthData(): bool
+    private function logoutByAuthData(string $accessToken): bool
     {
-        $decryptedToken = json_decode($this->converter->fromFrontendToJWT($this->getAuthData()), true);
-
         $headers = [
-            'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedToken['access_token']
+            'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $accessToken
         ];
 
         $response = $this->httpClient->post($this->url, [], $headers, ['http_errors' => false]);
@@ -70,12 +57,10 @@ class LogoutAction
         return false;
     }
 
-    private function logoutByRefreshToken(): bool
+    private function logoutByRefreshToken(string $refreshToken): bool
     {
-        $decryptedToken = json_decode($this->converter->fromFrontendToJWT($this->getAuthData()), true);
-
         $jwtFromRefresh = (new RefreshAction($this->configStore, $this->httpClient))
-            ->refresh($decryptedToken['refresh_token']);
+            ->refresh($refreshToken);
         $jwt = json_decode((string)$jwtFromRefresh, true);
 
         $headers = [

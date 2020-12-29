@@ -15,21 +15,16 @@ class AccessAction
     private HttpClientInterface $httpClient;
     private ConfigStoreInterface $configStore;
 
-    private array $authData;
-
     private string $url;
 
     public function __construct(
         ConverterInterface $converter,
         ConfigStoreInterface $configStore,
-        array $authData,
         HttpClientInterface $httpClient = null
     ) {
-        $this->authData = $authData;
         $this->converter = $converter;
         $this->configStore = $configStore;
         $this->httpClient = $httpClient ?? new GuzzleHttpClient();
-
 
         $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
         $checkUrl = trim($this->configStore->get('OAUTH_CHECK_URL'), '/');
@@ -37,12 +32,11 @@ class AccessAction
         $this->url = $baseUrl . '/' . $checkUrl;
     }
 
-    public function __invoke(): array
+    public function execute(array $authData): array
     {
-        $authData = $this->getAuthData();
         $decryptedAuthData = json_decode($this->converter->fromFrontendToJWT($authData), true);
 
-        if (!$this->check()) {
+        if (!$this->check($decryptedAuthData['access_token'])) {
             $jwtFromRefresh = (new RefreshAction($this->configStore, $this->httpClient))
                 ->refresh($decryptedAuthData['refresh_token']);
             return $this->converter->fromJWTToFrontend($jwtFromRefresh);
@@ -50,29 +44,15 @@ class AccessAction
         return $authData;
     }
 
-    public function check(): bool
+    private function check(string $accessToken): bool
     {
-        $authData = $this->getAuthData();
-
-        $decryptedAuthData = json_decode($this->converter->fromFrontendToJWT($authData), true);
-
         $headers = [
-            'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedAuthData['access_token'],
+            'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $accessToken,
         ];
 
         $responseClient = $this->httpClient->get($this->url, [], $headers, ['http_errors' => false]);
 
 
         return $responseClient->getStatusCode() === 200;
-    }
-
-    public function getAuthData(): array
-    {
-        return $this->authData;
-    }
-
-    public function setAuthData(array $authData): void
-    {
-        $this->authData = $authData;
     }
 }
