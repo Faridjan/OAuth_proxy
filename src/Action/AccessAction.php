@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 namespace Proxy\OAuth\Action;
 
-
+use Proxy\OAuth\Helpers\GuzzleHttpClient;
 use Proxy\OAuth\Interfaces\ConfigStoreInterface;
 use Proxy\OAuth\Interfaces\ConverterInterface;
 use Proxy\OAuth\Interfaces\HttpClientInterface;
@@ -16,44 +16,44 @@ class AccessAction
     private HttpClientInterface $httpClient;
     private ConfigStoreInterface $configStore;
 
-    private array $token;
+    private array $authData;
 
     public function __construct(
         ConverterInterface $converter,
-        HttpClientInterface $httpClient,
         ConfigStoreInterface $configStore,
-        array $token
+        array $authData,
+        HttpClientInterface $httpClient = null
     ) {
+        $this->authData = $authData;
         $this->converter = $converter;
-        $this->httpClient = $httpClient;
         $this->configStore = $configStore;
-        $this->token = $token;
+        $this->httpClient = $httpClient ?? new GuzzleHttpClient();;
     }
 
     public function __invoke(): array
     {
-        $token = $this->getToken();
-        $decryptedToken = json_decode($this->converter->fromFrontendToJWT($token), true);
+        $authData = $this->getAuthData();
+        $decryptedAuthData = json_decode($this->converter->fromFrontendToJWT($authData), true);
 
         if (!$this->check()) {
-            $responseClient = $this->refresh($decryptedToken['refresh_token']);
+            $responseClient = $this->refresh($decryptedAuthData['refresh_token']);
             return $this->converter->fromJWTToFrontend($responseClient);
         }
-        return $token;
+        return $authData;
     }
 
     public function check(): bool
     {
-        $token = $this->getToken();
+        $authData = $this->getAuthData();
         $baseUrl = trim($this->configStore->get('OAUTH_BASE_URL'), '/');
         $checkUrl = trim($this->configStore->get('OAUTH_CHECK_URL'), '/');
 
         $url = $baseUrl . '/' . $checkUrl;
 
-        $decryptedToken = json_decode($this->converter->fromFrontendToJWT($token), true);
+        $decryptedAuthData = json_decode($this->converter->fromFrontendToJWT($authData), true);
 
         $headers = [
-            'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedToken['access_token'],
+            'Authorization' => $this->configStore->get('OAUTH_TYPE') . ' ' . $decryptedAuthData['access_token'],
         ];
 
         $responseClient = $this->httpClient->get($url, [], $headers, ['http_errors' => false]);
@@ -79,14 +79,14 @@ class AccessAction
         return $this->httpClient->post($url, $body, [])->getBody()->getContents();
     }
 
-    public function getToken(): array
+    public function getAuthData(): array
     {
-        return $this->token;
+        return $this->authData;
     }
 
-    public function setToken(array $token): void
+    public function setAuthData(array $authData): void
     {
-        $this->token = $token;
+        $this->authData = $authData;
     }
 
 
