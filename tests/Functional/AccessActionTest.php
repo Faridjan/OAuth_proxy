@@ -13,10 +13,10 @@ class AccessActionTest extends WebTestCase
 {
     public function testSuccess(): void
     {
-        $result = $this->login();
+        $loginData = $this->login();
 
         $accessAction = new AccessAction($this->converter, $this->configStore);
-        $result = $accessAction->execute($result);
+        $result = $accessAction->execute($loginData);
 
         self::assertTrue(is_array($result));
 
@@ -28,18 +28,22 @@ class AccessActionTest extends WebTestCase
         self::assertEquals('BearerTest', $result['token_type']);
     }
 
-//    public function testInvalid(): void
-//    {
-//        $result = [];
-//
-//        $accessAction = new AccessAction($this->converter, $this->configStore);
-//
-//        self::assertTrue(is_array($result));
-//
-//        $this->expectException(Exception::class);
-////        $this->expectExceptionMessage('The User Entity not found, check user, domain credentials.');
-////        $this->expectExceptionCode(400);
-//
-//        $accessAction->execute($result);
-//    }
+    public function testInvalid(): void
+    {
+        $result = [
+            "token_type" => 'Bearer',
+            "expires_in" => "60",
+            "access_token" => "asdf",
+            "refresh_token" => "ASDF"
+        ];
+
+        $accessAction = new AccessAction($this->converter, $this->configStore);
+
+        self::assertTrue(is_array($result));
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('The refresh token is invalid.');
+        $this->expectExceptionCode(400);
+        $accessAction->execute($result);
+    }
 }
