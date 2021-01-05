@@ -31,7 +31,7 @@ class WebTestCase extends TestCase
 
         $this->httpClient = new GuzzleHttpClient();
 
-        $this->configStore = new DotEnvConfigStorage(__DIR__ . '/../');
+        $this->configStore = new DotEnvConfigStorage(__DIR__ . '/../../');
         $this->configStore->load();
     }
 }
