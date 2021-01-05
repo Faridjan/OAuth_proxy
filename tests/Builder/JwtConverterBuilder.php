@@ -14,7 +14,7 @@ class JwtConverterBuilder implements ConverterInterface
     public function fromFrontendToJWT(array $auth): string
     {
         foreach ($auth as $key => $value) {
-            $auth[$key] = $value . 'Test';
+            $auth[$key] = str_replace("Test", "", $value);
         }
         return json_encode($auth);
     }
@@ -24,7 +24,7 @@ class JwtConverterBuilder implements ConverterInterface
         $authData = json_decode($jwt, true);
 
         foreach ($authData as $key => $value) {
-            $authData[$key] = str_replace("Test", "", $value);
+            $authData[$key] = $value . 'Test';
         }
 
         return $authData;

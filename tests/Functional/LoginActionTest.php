@@ -13,15 +13,9 @@ use Proxy\OAuth\Action\Type\UsernameType;
 
 class LoginActionTest extends WebTestCase
 {
-
     public function testSuccess(): void
     {
-        $authAction = new LoginAction($this->converter, $this->configStore, $this->httpClient);
-
-        $username = new UsernameType('tyanrv');
-        $password = new PasswordType('hash');
-
-        $result = $authAction->login($username, $password);
+        $result = $this->login();
 
         self::assertTrue(is_array($result));
 
@@ -30,7 +24,7 @@ class LoginActionTest extends WebTestCase
         self::assertArrayHasKey('access_token', $result);
         self::assertArrayHasKey('refresh_token', $result);
 
-        self::assertEquals('Bearer', $result['token_type']);
+        self::assertEquals('BearerTest', $result['token_type']);
     }
 
     public function testInvalid(): void
