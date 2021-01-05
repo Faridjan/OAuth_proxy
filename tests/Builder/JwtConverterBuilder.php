@@ -11,6 +11,7 @@ use Proxy\OAuth\Interfaces\ConverterInterface;
 class JwtConverterBuilder implements ConverterInterface
 {
 
+
     public function fromFrontendToJWT(array $auth): string
     {
         foreach ($auth as $key => $value) {
