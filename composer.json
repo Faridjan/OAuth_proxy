@@ -13,20 +13,27 @@
     "vlucas/phpdotenv": "^5.2"
   },
   "require-dev": {
-    "roave/security-advisories": "dev-latest",
-    "webmozart/assert": "^1.9",
     "overtrue/phplint": "^2.3",
-    "squizlabs/php_codesniffer": "^3.5"
+    "phpunit/phpunit": "^9.5",
+    "roave/security-advisories": "dev-latest",
+    "squizlabs/php_codesniffer": "^3.5",
+    "webmozart/assert": "^1.9"
   },
   "autoload": {
     "psr-4": {
       "Proxy\\OAuth\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Test\\": "tests/"
+    }
+  },
   "scripts": {
     "phpcs": "phpcs --standard=phpcs.xml",
     "phpcbf": "phpcbf",
-    "lint": "phplint"
+    "lint": "phplint",
+    "test": "phpunit --colors=always"
   },
   "authors": [
     {

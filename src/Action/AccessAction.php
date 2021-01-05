@@ -35,7 +35,6 @@ class AccessAction
     public function execute(array $authData): array
     {
         $decryptedAuthData = json_decode($this->converter->fromFrontendToJWT($authData), true);
-
         if (!$this->check($decryptedAuthData['access_token'])) {
             $jwtFromRefresh = (new RefreshAction($this->configStore, $this->httpClient))
                 ->refresh($decryptedAuthData['refresh_token']);
