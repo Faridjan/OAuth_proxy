@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 
-namespace Functional;
+namespace Test\Functional;
 
 
 use Proxy\OAuth\Action\LoginAction;

@@ -23,6 +23,11 @@
       "Proxy\\OAuth\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Test\\": "tests/"
+    }
+  },
   "scripts": {
     "phpcs": "phpcs --standard=phpcs.xml",
     "phpcbf": "phpcbf",

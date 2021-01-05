@@ -11,10 +11,10 @@
          failOnWarning="true"
          verbose="true">
     <testsuites>
-<!--        <testsuite name="unit">-->
-<!--            <directory>tests/Unit</directory>-->
-<!--            <directory>src/Model</directory>-->
-<!--        </testsuite>-->
+        <testsuite name="unit">
+            <directory>tests/Unit</directory>
+            <directory>src/Model</directory>
+        </testsuite>
         <testsuite name="functional">
             <directory>tests/Functional</directory>
         </testsuite>

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 
-namespace Builder;
+namespace Test\Builder;
 
 
 use Proxy\OAuth\Interfaces\ConverterInterface;

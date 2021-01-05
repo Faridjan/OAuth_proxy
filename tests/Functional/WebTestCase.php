@@ -3,14 +3,13 @@
 declare(strict_types=1);
 
 
-namespace Functional;
+namespace Test\Functional;
 
-
-use Builder\JwtConverterBuilder;
 use PHPUnit\Framework\TestCase;
 use Proxy\OAuth\Helpers\DotEnvConfigStorage;
 use Proxy\OAuth\Helpers\GuzzleHttpClient;
 use Proxy\OAuth\Interfaces\ConverterInterface;
+use Test\Builder\JwtConverterBuilder;
 
 class WebTestCase extends TestCase
 {
