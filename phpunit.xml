@@ -12,7 +12,7 @@
          verbose="true">
     <testsuites>
         <testsuite name="unit">
-            <directory>src/Type/Test</directory>
+            <directory>src/Action/Type/Test</directory>
         </testsuite>
         <testsuite name="functional">
             <directory>tests/Functional</directory>
