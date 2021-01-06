@@ -11,6 +11,9 @@
          failOnWarning="true"
          verbose="true">
     <testsuites>
+        <testsuite name="unit">
+            <directory>src/Action/Type/Test</directory>
+        </testsuite>
         <testsuite name="functional">
             <directory>tests/Functional</directory>
         </testsuite>
